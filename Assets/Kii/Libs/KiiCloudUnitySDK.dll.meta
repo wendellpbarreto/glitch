@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: 52b83b5baf2f144d1a747a149e9d2423
+timeCreated: 1458255240
+licenseType: Free
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder:
+    KiiCorp.Cloud.Unity.KiiInitializeBehaviour: -1100
+  isPreloaded: 0
+  platformData:
+    Any:
+      enabled: 1
+      settings: {}
+    Editor:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+    WindowsStoreApps:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

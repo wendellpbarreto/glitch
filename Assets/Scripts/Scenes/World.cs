@@ -6,12 +6,13 @@ public class World : Photon.PunBehaviour {
 	public GameObject playerPrefab;
 
 	// Use this for initialization
-	void Start () {
+	void OnLevelWasLoaded () {
 		PhotonNetwork.ConnectUsingSettings("0.1");	
 	}
 	
 	// Update is called once per frame
 	void Update() {
+		
 	}
 
 	void OnGUI()
@@ -32,7 +33,9 @@ public class World : Photon.PunBehaviour {
 
 	void OnJoinedRoom()
 	{
+		Debug.Log ("Joined");
 		GameObject player = PhotonNetwork.Instantiate("playerPrefab", Vector3.zero, Quaternion.identity, 0);
+		Debug.Log (player.ToString());
 		if (player != null) {
 			PlayerController playerController = player.GetComponent<PlayerController>();
 			playerController.enabled = true;
