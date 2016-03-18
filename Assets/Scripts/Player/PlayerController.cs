@@ -17,9 +17,10 @@ public class PlayerController : MonoBehaviour {
 
     void Start()
     {
-        anim = GetComponent<Animation>();
-        playerAttributes = new Goblin();
+		playerAttributes = DataManager.GetPlayerAttributes();
 		List<BaseSkill> charSkills = playerAttributes.GetSkills ();
+
+        anim = GetComponent<Animation>();
 
 		delays = new float[5];
 		cooldowns = new float[5];

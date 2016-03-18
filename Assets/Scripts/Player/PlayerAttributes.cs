@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+
 public class PlayerAttributes : BaseAttributes {
 
 	protected List<BaseSkill> skills;

@@ -33,8 +33,8 @@ public class World : Photon.PunBehaviour {
 
 	void OnJoinedRoom()
 	{
-		Debug.Log ("Joined");
-		GameObject player = PhotonNetwork.Instantiate("playerPrefab", Vector3.zero, Quaternion.identity, 0);
+		Debug.Log ("Joined - "+DataManager.GetPlayerAttributes().GetType().ToString());
+		GameObject player = PhotonNetwork.Instantiate(DataManager.GetPlayerAttributes().GetType().ToString(), Vector3.zero, Quaternion.identity, 0);
 		Debug.Log (player.ToString());
 		if (player != null) {
 			PlayerController playerController = player.GetComponent<PlayerController>();

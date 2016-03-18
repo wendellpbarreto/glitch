@@ -34,6 +34,7 @@ public class CharacterSelection : MonoBehaviour {
 			foreach(PlayerAttributes character in characters){
 				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), character.GetType ().ToString () + " - " + character.MaxHP ().ToString ())) {
 					Debug.LogWarning ("Character selected");
+					DataManager.SetPlayerAttributes (character);
 					Application.LoadLevel ("World");
 				}
 				i += 1;
