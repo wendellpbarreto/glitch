@@ -12,92 +12,99 @@ public static class Game {
 
 	public static void LoadStatic(){
 		Game.LoadClasses();
+		Game.LoadClassesSkills();
+		Game.LoadItems ();
+		gameIsReady = true;
 	}
 
 	private static void LoadClasses(){
 		characterClasses = new List<CharacterClass> ();
 		
 		KiiBucket bucket = Kii.Bucket("characterClasses");
-		bucket.Query(new KiiQuery(), (KiiQueryResult<KiiObject> list, Exception e) => {
-			if (e != null)
-			{
-				Debug.LogError("Failed to query " + e.ToString());
-			}
-			else
-			{
-				Debug.Log(list.Count.ToString() + " classes Loaded");
-				foreach (KiiObject obj in list)
-				{
-					CharacterClass characterClass = new CharacterClass();
-					characterClass.name = obj.GetString("name");
+		List<KiiObject> list = bucket.Query (new KiiQuery ());
+		Debug.Log(list.Count.ToString() + " classes Loaded");
+		foreach (KiiObject obj in list)
+		{
+			CharacterClass characterClass = new CharacterClass();
+			characterClass.name = obj.GetString("name");
 
-					characterClass.prefabName = obj.GetString("prefabName");
-					characterClass.deathAnimation = obj.GetString("deathAnimation");
-					characterClass.idleanimation = obj.GetString("idleanimation");
-					characterClass.runAnimation = obj.GetString("runAnimation");
+			characterClass.prefabName = obj.GetString("prefabName");
+			characterClass.deathAnimation = obj.GetString("deathAnimation");
+			characterClass.idleanimation = obj.GetString("idleanimation");
+			characterClass.runAnimation = obj.GetString("runAnimation");
 
-					//Atributes Stuff
-					characterClass.strenght = (float) obj.GetDouble("strenght");
-					characterClass.dextrery = (float) obj.GetDouble("dextrery");
-					characterClass.inteligence = (float) obj.GetDouble("inteligence");
-					characterClass.vitality = (float) obj.GetDouble("vitality");
+			//Atributes Stuff
+			characterClass.strenght = (float) obj.GetDouble("strenght");
+			characterClass.dextrery = (float) obj.GetDouble("dextrery");
+			characterClass.inteligence = (float) obj.GetDouble("inteligence");
+			characterClass.vitality = (float) obj.GetDouble("vitality");
 
-					characterClass.strenghtPerLevel = (float) obj.GetDouble("strenghtPerLevel");
-					characterClass.dextreryPerLevel = (float) obj.GetDouble("dextreryPerLevel");
-					characterClass.inteligencePerLevel = (float) obj.GetDouble("inteligencePerLevel");
-					characterClass.vitalityPerLevel = (float) obj.GetDouble("vitalityPerLevel");
+			characterClass.strenghtPerLevel = (float) obj.GetDouble("strenghtPerLevel");
+			characterClass.dextreryPerLevel = (float) obj.GetDouble("dextreryPerLevel");
+			characterClass.inteligencePerLevel = (float) obj.GetDouble("inteligencePerLevel");
+			characterClass.vitalityPerLevel = (float) obj.GetDouble("vitalityPerLevel");
 
-					characterClass.mainAttributeName = obj.GetString("mainAttributeName");
+			characterClass.mainAttributeName = obj.GetString("mainAttributeName");
 
-					characterClasses.Add(characterClass);
-				}
-				Game.LoadClassesSkills();
-			}
-
-		});
+			characterClasses.Add(characterClass);
+		}
 	}
 
 	private static void LoadClassesSkills(){
 		KiiBucket bucket = Kii.Bucket("skills");
-
 		foreach(CharacterClass characterClass in characterClasses){
 			KiiQuery query = new KiiQuery (KiiClause.Equals("characterClassName", characterClass.name));
-			bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
-				if (e != null)
-				{
-					Debug.LogError("Failed to query " + e.ToString());
-				}
-				else
-				{
-					Debug.Log(characterClass.name+": "+list.Count.ToString()+" skills found");
-					foreach (KiiObject obj in list)
-					{
-						Skill skill = new Skill();
+			List<KiiObject> list = bucket.Query (query);
+			Debug.Log(characterClass.name+": "+list.Count.ToString()+" skills found");
+			foreach (KiiObject obj in list)
+			{
+				Skill skill = new Skill();
 
-						skill.id = obj.GetString("_id");
-						skill.animationName = obj.GetString("animationName");
-						skill.name = obj.GetString("name"); 
-						skill.description = obj.GetString("description");
-						skill.damage = (float) obj.GetDouble("damage");
-						skill.damagePerLevel = (float) obj.GetDouble("damagePerLevel");
-						skill.cooldown = (float) obj.GetDouble("cooldown");
-						skill.range = (float) obj.GetDouble("range");
+				skill.id = obj.GetString("_id");
+				skill.animationName = obj.GetString("animationName");
+				skill.name = obj.GetString("name"); 
+				skill.description = obj.GetString("description");
+				skill.damage = (float) obj.GetDouble("damage");
+				skill.damagePerLevel = (float) obj.GetDouble("damagePerLevel");
+				skill.cooldown = (float) obj.GetDouble("cooldown");
+				skill.range = (float) obj.GetDouble("range");
 
-						characterClass.skills.Add(skill);
-					}
-					if (characterClass == characterClasses[characterClasses.Count-1])
-						Game.gameIsReady = true;
-				}
-			});
+				characterClass.skills.Add(skill);
+			}
 		}
 	}
 
-	private static void LoadClassesItems(){
-
-	}
-
 	private static void LoadItems(){
-	
+		items = new List<Item> ();
+
+		KiiBucket bucket = Kii.Bucket("items");
+		List<KiiObject> list = bucket.Query (new KiiQuery ());
+		Debug.Log(list.Count.ToString() + " items Loaded");
+		foreach (KiiObject obj in list)
+		{
+			Item item = new Item();
+			item.id = obj.GetString("_id");
+
+			item.characterClassName = obj.GetString("characterClassName");
+			item.bodyPart = obj.GetString("bodyPart");
+			item.itemTier = obj.GetString("itemTier");
+
+			item.name = obj.GetString("name");
+			item.description = obj.GetString("description");
+			item.iconName = obj.GetString("iconName");
+			item.meshName = obj.GetString("meshName");
+
+			item.hp = (float) obj.GetDouble("hp");
+			item.mp = (float) obj.GetDouble("mp");
+			item.defense = (float) obj.GetDouble("defense");
+
+			item.strenght = (float) obj.GetDouble("strenght");
+			item.dextrery = (float) obj.GetDouble("dextrery");
+			item.inteligence = (float) obj.GetDouble("inteligence");
+			item.vitality = (float) obj.GetDouble("vitality");
+
+			items.Add(item);
+		}
 	}
 
 	public static CharacterClass GetClassByName(string name){
@@ -108,64 +115,12 @@ public static class Game {
 		return null;
 	}
 
-	private static void InitializeGoblinClass(){
-		
-		KiiBucket characterClassBucket = Kii.Bucket("characterClasses");
-		KiiObject kiiObj = characterClassBucket.NewKiiObject();
-
-		kiiObj["name"] = "goblin";
-
-		kiiObj["prefabName"] = "Goblin";
-		kiiObj["deathAnimation"] = "";
-		kiiObj["idleanimation"] = "idle";
-		kiiObj["runAnimation"] = "run";
-
-		//Atributes Stuff
-		kiiObj["strenght"] = 10d;
-		kiiObj["dextrery"] = 10d;
-		kiiObj["inteligence"] = 10d;
-		kiiObj["vitality"] = 10d;
-
-		kiiObj["strenghtPerLevel"] = 1d;
-		kiiObj["dextreryPerLevel"] = 1d;
-		kiiObj["inteligencePerLevel"] = 1d;
-		kiiObj["vitalityPerLevel"] = 1d;
-
-		kiiObj["mainAttributeName"] = "Dextrery";
-
-		kiiObj.Save((KiiObject obj, Exception e) => {
-			if (e != null)
-			{
-				Debug.LogError("Failed to save score" + e.ToString());
-			}
-			else
-			{
-				Debug.Log("Goblin Created");
-			}
-		});
-
-		KiiBucket skillBucket = Kii.Bucket("skills");
-		KiiObject skill = skillBucket.NewKiiObject();
-
-		skill["characterClassName"] = "goblin";
-		skill["animationName"] = "attack3";
-		skill["name"] = "RegularAttack";
-		skill["description"] = "Regular Goblin Attack";
-		skill["damage"] = 100d;
-		skill["damagePerLevel"] = 20d;
-		skill["cooldown"] = 1d;
-		skill["range"] = 5d;
-
-		skill.Save((KiiObject obj, Exception e) => {
-			if (e != null)
-			{
-				Debug.LogError("Failed to save score" + e.ToString());
-			}
-			else
-			{
-				Debug.Log("Goblin regular attack added");
-			}
-		});
+	public static Item GetItemById(string id){
+		foreach (Item item in items) {
+			if (id == item.id)
+				return item;
+		}
+		return null;
 	}
 }
 

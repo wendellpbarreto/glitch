@@ -71,6 +71,58 @@ public class CreateCharacter : MonoBehaviour {
 		}
 	}
 
+	void createCharacterInventory(){
+		KiiUser user = KiiUser.CurrentUser;
+		KiiBucket bucket = Kii.Bucket("inventories");
+		KiiObject inventory = bucket.NewKiiObject();
+		inventory["characterName"] = this.name;
+
+		inventory["head"] = "";
+		inventory["body"] = "";
+		inventory["shoulder"] = "";
+		inventory["hand"] = "";
+		inventory["feet"] = "";
+		inventory["weapon"] = "";
+
+		inventory.Save((KiiObject obj, Exception e) => {
+			if (e != null) {
+				Debug.LogError("Failed to save score" + e.ToString());
+			} else {
+				Debug.Log("Character inventory created");
+			}
+		});
+	}
+
+	void addTier1Items(){
+		KiiBucket bucket = Kii.Bucket("items");
+		KiiQuery query = new KiiQuery (
+			KiiClause.And(
+				KiiClause.Equals("itemTier", ItemTier.Tier1.ToString()),
+				KiiClause.Equals("characterClassName", characterClass.name)
+			)
+		);
+		bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
+			if (e != null){
+				Debug.LogError("Failed to query " + e.ToString());
+			} else {
+				Debug.Log(list.Count.ToString()+" tier 1 itens found");
+				KiiBucket characterItemsBucket = Kii.Bucket("characterItems");
+				foreach(KiiObject obj in list){
+					KiiObject characterItem = characterItemsBucket.NewKiiObject();
+					characterItem["itemId"] = obj.GetString("_id");
+					characterItem["characterName"] = this.name;
+					characterItem.Save((KiiObject obj2, Exception e2) => {
+						if (e != null) {
+							Debug.LogError("Failed to save score" + e.ToString());
+						} else {
+							Debug.Log("Character item created");
+						}
+					});
+				}
+			}
+		});
+	}
+
 	void VerifyName(){
 		KiiBucket bucket = Kii.Bucket("characters");
 		KiiQuery query = new KiiQuery (KiiClause.Equals("name", this.name));
@@ -84,6 +136,8 @@ public class CreateCharacter : MonoBehaviour {
 					Debug.Log("Name is avaliable");
 					createCharacter();
 					createCharacterSkills();
+					createCharacterInventory();
+					addTier1Items();
 				}	
 			}
 		});

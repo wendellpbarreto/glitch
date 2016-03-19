@@ -1,10 +1,27 @@
 ﻿using System;
 
+enum BodyPart{
+	Head,
+	Body,
+	Shoulder,
+	Hand,
+	Feet,
+	Weapon
+}
+
+enum ItemTier {
+	Tier1,
+	Tier2,
+	Tier3
+}
+
 public class Item {
+	
 	public string id;
 
-	public string characterClass;
+	public string characterClassName;
 	public string bodyPart;
+	public string itemTier;
 
 	public string name;
 	public string description;

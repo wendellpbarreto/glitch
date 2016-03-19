@@ -19,7 +19,6 @@ public class CharacterClass : BaseAttributes {
 	public string mainAttributeName;
 
 	public List<Skill> skills;
-	public List<Item> items;
 
 	public CharacterClass(){
 		skills = new List<Skill>();

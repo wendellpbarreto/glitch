@@ -6,6 +6,7 @@ using System;
 
 public class CharacterSelection : MonoBehaviour {
 
+	private bool charactersLoaded = false;
 
 	List<Character> characters;
 
@@ -13,6 +14,9 @@ public class CharacterSelection : MonoBehaviour {
 	void OnLevelWasLoaded () {
 		characters = new List<Character> ();
 		loadCharacters ();
+		loadCharactersSkills ();
+		loadCharactersIventory ();
+		loadCharactersItems ();
 	}
 	
 	// Update is called once per frame
@@ -45,40 +49,48 @@ public class CharacterSelection : MonoBehaviour {
 		KiiUser user = KiiUser.CurrentUser;
 		KiiBucket bucket = Kii.Bucket("characters");
 		KiiQuery query = new KiiQuery (KiiClause.Equals("username", user.Username));
-		bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
-			if (e != null)
-			{
-				Debug.LogError("Failed to query " + e.ToString());
-			}
-			else
-			{
-				Debug.Log(list.Count.ToString()+" characters found");
-				foreach (KiiObject obj in list)
-				{
-					characters.Add(Character.KiiObjToCharacter(obj));
-				}
-				loadCharactersSkills();
-			}
-		});
+		List<KiiObject> list = bucket.Query(query);
+		Debug.Log(list.Count.ToString()+" characters found");
+		foreach (KiiObject obj in list)
+		{
+			characters.Add(Character.KiiObjToCharacter(obj));
+		}
 	}
+
 	void loadCharactersSkills(){
 		KiiBucket bucket = Kii.Bucket("characterSkills");
 		foreach (Character character in characters) {
 			KiiQuery query = new KiiQuery (KiiClause.Equals ("characterName", character.name));
-			bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
-				if (e != null)
-				{
-					Debug.LogError("Failed to query " + e.ToString());
-				}
-				else
-				{
-					Debug.Log(character.name + " - " + list.Count.ToString() + " character skills found");
-					foreach (KiiObject obj in list)
-					{
-						character.addKiiCharacterSkills(obj);
-					}
-				}
-			});
+			List<KiiObject> list = bucket.Query (query);
+			Debug.Log(character.name + " - " + list.Count.ToString() + " character skills found");
+			foreach (KiiObject obj in list)
+			{
+				character.addKiiCharacterSkills(obj);
+			}
+		}
+	}
+
+	void loadCharactersIventory(){
+		KiiBucket bucket = Kii.Bucket("iventories");
+		foreach (Character character in characters) {
+			KiiQuery query = new KiiQuery (KiiClause.Equals ("characterName", character.name));
+			List<KiiObject> list = bucket.Query (query);
+			Debug.Log(character.name + " - " + list.Count.ToString() + " iventories found");
+			if (list.Count > 0)
+				character.addKiiInventory(list[0]);
+		}
+	}
+
+	void loadCharactersItems(){
+		KiiBucket bucket = Kii.Bucket("characterItems");
+		foreach (Character character in characters) {
+			KiiQuery query = new KiiQuery (KiiClause.Equals ("characterName", character.name));
+			List<KiiObject> list = bucket.Query (query);
+			Debug.Log(character.name + " - " + list.Count.ToString() + " character items found");
+			foreach (KiiObject obj in list)
+			{
+				character.addKiiCharacterItem (obj);
+			}
 		}
 	}
 }
