@@ -7,7 +7,8 @@ public class World : Photon.PunBehaviour {
 
 	// Use this for initialization
 	void OnLevelWasLoaded () {
-		PhotonNetwork.ConnectUsingSettings("0.1");	
+		PhotonNetwork.ConnectUsingSettings("0.1");
+		Player.character.EnterWorld ();
 	}
 	
 	// Update is called once per frame
@@ -33,8 +34,8 @@ public class World : Photon.PunBehaviour {
 
 	void OnJoinedRoom()
 	{
-		Debug.Log ("Joined - "+DataManager.GetPlayerAttributes().GetType().ToString());
-		GameObject player = PhotonNetwork.Instantiate(DataManager.GetPlayerAttributes().GetType().ToString(), Vector3.zero, Quaternion.identity, 0);
+		Debug.Log ("Joined - "+Player.character.characterClassName);
+		GameObject player = PhotonNetwork.Instantiate(Player.character.characterClass.prefabName, Vector3.zero, Quaternion.identity, 0);
 		Debug.Log (player.ToString());
 		if (player != null) {
 			PlayerController playerController = player.GetComponent<PlayerController>();

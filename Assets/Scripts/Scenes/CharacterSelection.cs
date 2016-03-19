@@ -7,11 +7,11 @@ using System;
 public class CharacterSelection : MonoBehaviour {
 
 
-	List<PlayerAttributes> characters;
+	List<Character> characters;
 
 	// Use this for initialization
 	void OnLevelWasLoaded () {
-		characters = new List<PlayerAttributes> ();
+		characters = new List<Character> ();
 		loadCharacters ();
 	}
 	
@@ -31,10 +31,10 @@ public class CharacterSelection : MonoBehaviour {
 		}
 		int i = 1;
 		if (characters != null && characters.Count > 0)
-			foreach(PlayerAttributes character in characters){
-				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), character.GetType ().ToString () + " - " + character.MaxHP ().ToString ())) {
+			foreach(Character character in characters){
+				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), character.characterClass.name.ToString () + " - " + character.level.ToString ())) {
 					Debug.LogWarning ("Character selected");
-					DataManager.SetPlayerAttributes (character);
+					Player.character = character;
 					Application.LoadLevel ("Home");
 				}
 				i += 1;
@@ -44,24 +44,41 @@ public class CharacterSelection : MonoBehaviour {
 	void loadCharacters(){
 		KiiUser user = KiiUser.CurrentUser;
 		KiiBucket bucket = Kii.Bucket("characters");
-		KiiQuery query = new KiiQuery(KiiClause.Equals("username", 	user.Username));
-		query.Limit = 5;
-		bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) =>
+		KiiQuery query = new KiiQuery (KiiClause.Equals("username", user.Username));
+		bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
+			if (e != null)
 			{
+				Debug.LogError("Failed to query " + e.ToString());
+			}
+			else
+			{
+				Debug.Log(list.Count.ToString()+" characters found");
+				foreach (KiiObject obj in list)
+				{
+					characters.Add(Character.KiiObjToCharacter(obj));
+				}
+				loadCharactersSkills();
+			}
+		});
+	}
+	void loadCharactersSkills(){
+		KiiBucket bucket = Kii.Bucket("characterSkills");
+		foreach (Character character in characters) {
+			KiiQuery query = new KiiQuery (KiiClause.Equals ("characterName", character.name));
+			bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
 				if (e != null)
 				{
 					Debug.LogError("Failed to query " + e.ToString());
 				}
 				else
 				{
-					Debug.Log("Query succeeded");
+					Debug.Log(character.name + " - " + list.Count.ToString() + " character skills found");
 					foreach (KiiObject obj in list)
 					{
-						var type = Type.GetType(obj.GetString("characterClass"));
-						var playerAttributes = (PlayerAttributes)Activator.CreateInstance(type);
-						characters.Add(playerAttributes);
+						character.addKiiCharacterSkills(obj);
 					}
 				}
 			});
+		}
 	}
 }

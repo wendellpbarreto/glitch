@@ -35,7 +35,7 @@ public class EnemyController : MonoBehaviour {
 	void OnGUI(){
 		gameObject.GetComponentInChildren<Canvas>().transform.LookAt (Camera.main.transform);
 
-		float hpRatio = enemyAttributes.CurrentHP / enemyAttributes.MaxHP ();
+		float hpRatio = enemyAttributes.currentHp / enemyAttributes.MaxHP ();
 		this.healthBar.transform.localScale = new Vector3 (hpRatio, healthBar.transform.localScale.y, healthBar.transform.localScale.z);
 	}
 
@@ -83,7 +83,7 @@ public class EnemyController : MonoBehaviour {
 
 	[PunRPC]
 	public void TakeDamage(float damage){
-		Debug.Log ("Enemy damaged");
+		Debug.Log ("Enemy damaged for "+damage.ToString());
 		enemyAttributes.TakeDamage (damage);
 	}
 }

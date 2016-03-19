@@ -4,10 +4,11 @@ using KiiCorp.Cloud.Storage;
 using System;
 
 public class CreateCharacter : MonoBehaviour {
+	private CharacterClass characterClass;
+	private string name = "ADMIN";
 
 	// Use this for initialization
 	void OnLevelWasLoaded () {
-		createCharacter ();
 	}
 	
 	// Update is called once per frame
@@ -15,24 +16,76 @@ public class CreateCharacter : MonoBehaviour {
 	
 	}
 
+	void OnGUI(){
+		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "DONE")) {
+			VerifyName ();
+		}
+		int i = 1;
+		if (Game.characterClasses != null && Game.characterClasses.Count > 0)
+			foreach(CharacterClass charClass in Game.characterClasses){
+				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), charClass.name)) {
+					this.characterClass = charClass;
+				}
+				i += 1;
+			}
+		
+	}
+
 	public void createCharacter()
 	{
 		KiiUser user = KiiUser.CurrentUser;
 		KiiBucket bucket = Kii.Bucket("characters");
 		KiiObject kiiObj = bucket.NewKiiObject();
-		kiiObj["characterClass"] = "Goblin";
-		kiiObj["username"] =  user.Username;
-		kiiObj.Save((KiiObject obj, Exception e) =>
-			{
-				if (e != null)
-				{
+		kiiObj["username"] = user.Username;
+		kiiObj["name"] = this.name;
+		kiiObj["level"] = 0;
+		kiiObj["experience"] = 0;
+		kiiObj["title"] = "noob";
+		kiiObj["gold"] = 0;
+		kiiObj["gem"] = 0;
+		kiiObj["characterClassName"] = this.characterClass.name;
+		kiiObj.Save((KiiObject obj, Exception e) => {
+			if (e != null) {
+				Debug.LogError("Failed to save score" + e.ToString());
+			} else {
+				Debug.Log("Character created");
+				Application.LoadLevel("CharacterSelection");
+			}
+		});
+	}
+
+	void createCharacterSkills(){
+		KiiBucket bucket = Kii.Bucket("characterSkills");
+		foreach (Skill skill in characterClass.skills) {
+			KiiObject kiiObj = bucket.NewKiiObject();
+			kiiObj["characterName"] = this.name;
+			kiiObj["skillId"] = skill.id;
+			kiiObj["skillLevel"] = 1;
+			kiiObj.Save((KiiObject obj, Exception e) => {
+				if (e != null) {
 					Debug.LogError("Failed to save score" + e.ToString());
-				}
-				else
-				{
-					Debug.Log("Character created");
-					Application.LoadLevel("CharacterSelection");
+				} else {
+					Debug.Log("Character skill created");
 				}
 			});
+		}
+	}
+
+	void VerifyName(){
+		KiiBucket bucket = Kii.Bucket("characters");
+		KiiQuery query = new KiiQuery (KiiClause.Equals("name", this.name));
+		bucket.Query(query, (KiiQueryResult<KiiObject> list, Exception e) => {
+			if (e != null){
+				Debug.LogError("Failed to query " + e.ToString());
+			} else {
+				if (list.Count > 0){
+					Debug.Log("Name is unavaliable");
+				} else {
+					Debug.Log("Name is avaliable");
+					createCharacter();
+					createCharacterSkills();
+				}	
+			}
+		});
 	}
 }

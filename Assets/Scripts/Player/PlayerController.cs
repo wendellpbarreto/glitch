@@ -13,12 +13,9 @@ public class PlayerController : MonoBehaviour {
 
     Animation anim;
 
-	public PlayerAttributes playerAttributes;
-
     void Start()
     {
-		playerAttributes = DataManager.GetPlayerAttributes();
-		List<BaseSkill> charSkills = playerAttributes.GetSkills ();
+		List<Skill> charSkills = Player.character.characterClass.skills;
 
         anim = GetComponent<Animation>();
 
@@ -27,7 +24,7 @@ public class PlayerController : MonoBehaviour {
 
 		cooldowns [0] = 1.1f;
 		for (int i = 0; i < charSkills.Count; i++)
-			cooldowns [i + 1] = charSkills [i].GetCooldown ();
+			cooldowns [i + 1] = charSkills [i].cooldown;
     }
 
     void FixedUpdate() {
@@ -51,7 +48,7 @@ public class PlayerController : MonoBehaviour {
     }
 
 	void Update(){
-		if (!playerAttributes.IsAlive ()) {
+		if (!Player.character.IsAlive()) {
 			Destroy (this.gameObject);
 			Debug.Log ("Dead");
 		} else {
@@ -67,7 +64,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void UseSkill(int index){
-		BaseSkill skill = playerAttributes.GetSkills () [index];
+		Skill skill = Player.character.characterClass.skills[index];
 
 		if (delays[0] <= 0 && delays[index+1] <= 0) {
 			GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -75,13 +72,13 @@ public class PlayerController : MonoBehaviour {
 			foreach (GameObject t in enemies)
 			{
 				float dist = Vector3.Distance(t.transform.position, currentPos);
-				if (dist < skill.GetRange())
+				if (dist < skill.range)
 				{
 					PhotonView photonView = PhotonView.Get(t);
-					photonView.RPC("TakeDamage", PhotonTargets.All, skill.GetDamage());
+					photonView.RPC("TakeDamage", PhotonTargets.All, skill.Damage());
 				}
 			}
-			anim.CrossFade (skill.GetAnimationName());
+			anim.CrossFade (skill.animationName);
 			delays[0] = cooldowns[0];
 			delays [index + 1] = cooldowns [index + 1];
 		}
@@ -89,6 +86,6 @@ public class PlayerController : MonoBehaviour {
 
 	[PunRPC]
 	public void TakeDamage(float damage){
-		this.playerAttributes.TakeDamage (damage);
+		Player.character.TakeDamage (damage);
 	}
 }

@@ -3,6 +3,9 @@ using System.Collections;
 
 public class EnemyAttributes : BaseAttributes {
 
+	public float currentHp;
+	public float currentMp;
+
 	public EnemyAttributes(){
 		this.strenght = 10;
 		this.dextrery = 10;
@@ -14,7 +17,19 @@ public class EnemyAttributes : BaseAttributes {
 	}
 
 	public float GetDamage(){
-		return 100;
+		return 1;
+	}
+
+	public float MaxHP() {
+		return this.vitality * 1000;
+	}
+
+	public float MaxMP() {
+		return this.inteligence * 100;
+	}
+
+	public bool IsAlive(){
+		return this.currentHp > 0;
 	}
 		
 	public void TakeDamage(float damage){
