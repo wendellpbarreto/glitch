@@ -48,14 +48,8 @@ public class Login : MonoBehaviour {
 				else
 				{
 					Debug.Log("Login succeeded");
-					Game.LoadStatic();
+					Application.LoadLevel("CharacterSelection");
 				}
 			});
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (Game.gameIsReady)
-			Application.LoadLevel("CharacterSelection");
 	}
 }
