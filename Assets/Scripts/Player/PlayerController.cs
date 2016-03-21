@@ -49,7 +49,6 @@ public class PlayerController : MonoBehaviour {
 
 	void Update(){
 		if (!Player.character.IsAlive()) {
-			Destroy (this.gameObject);
 			Debug.Log ("Dead");
 		} else {
 			UpdateDelays ();
@@ -69,19 +68,62 @@ public class PlayerController : MonoBehaviour {
 		if (delays[0] <= 0 && delays[index+1] <= 0) {
 			GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 			Vector3 currentPos = transform.position;
+
+			List<GameObject> enemiesInRange = new List<GameObject> ();
+			List<GameObject> enemiesInTarget;
 			foreach (GameObject t in enemies)
 			{
 				float dist = Vector3.Distance(t.transform.position, currentPos);
-				if (dist < skill.range)
-				{
-					PhotonView photonView = PhotonView.Get(t);
-					photonView.RPC("TakeDamage", PhotonTargets.All, skill.Damage());
+				if (dist < skill.range) {
+					enemiesInRange.Add(t);
 				}
 			}
+			enemiesInTarget = GetEnemiesInTarget (enemiesInRange);
+
+			if (enemiesInRange.Count > 0 && enemiesInTarget.Count == 0 ) {
+				GameObject target = GetNearestEnemy (enemiesInRange);
+				transform.LookAt (target.transform);
+				enemiesInTarget = GetEnemiesInTarget (enemiesInRange);
+			}
+
+			foreach (GameObject t in enemiesInTarget) {
+				PhotonView photonView = PhotonView.Get(t);
+				photonView.RPC("TakeDamage", PhotonTargets.All, skill.Damage());
+			}
+
 			anim.CrossFade (skill.animationName);
 			delays[0] = cooldowns[0];
 			delays [index + 1] = cooldowns [index + 1];
 		}
+	}
+
+	private List<GameObject> GetEnemiesInTarget(List<GameObject> enemies){
+		List<GameObject> enemiesInTarget = new List<GameObject> ();
+		foreach (GameObject t in enemies) {
+			Vector3 directionToTarget = t.transform.position - transform.position;
+			float angle = Vector3.Angle(transform.forward, directionToTarget);
+			if (Mathf.Abs(angle) < 45)
+			{
+				enemiesInTarget.Add (t);
+			}
+		}
+		return enemiesInTarget;
+	}
+
+	private GameObject GetNearestEnemy(List<GameObject> enemies){
+		GameObject tMin = null;
+		float minDist = Mathf.Infinity;
+		Vector3 currentPos = transform.position;
+		foreach (GameObject t in enemies)
+		{
+			float dist = Vector3.Distance(t.transform.position, currentPos);
+			if (dist < minDist)
+			{
+				tMin = t;
+				minDist = dist;
+			}
+		}
+		return tMin;
 	}
 
 	[PunRPC]

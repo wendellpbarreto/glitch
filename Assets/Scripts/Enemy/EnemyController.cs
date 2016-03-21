@@ -23,9 +23,8 @@ public class EnemyController : MonoBehaviour {
 			if (delay > 0)
 				delay -= Time.deltaTime;
 
-			if (InRange()) {
-				if (delay <= 0)
-					AttackPlayer ();
+			if (InRange() && playerTransform != null && delay <= 0) {
+				AttackPlayer ();
 			} else {
 				MoveToPlayer ();	
 			}	
