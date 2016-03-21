@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour {
 				anim.CrossFade ("run");
 			} else if (CrossPlatformInputManager.GetButton ("Attack")) {
 				UseSkill(0);
+			} else if (CrossPlatformInputManager.GetButton ("Skill")) {
+				UseSkill(1);
 			} else {
 				anim.CrossFade ("idle");
 			}
@@ -63,33 +65,46 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void UseSkill(int index){
+		if (index >= Player.character.characterClass.skills.Count)
+			return;
+		
 		Skill skill = Player.character.characterClass.skills[index];
 
 		if (delays[0] <= 0 && delays[index+1] <= 0) {
-			GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+			List<GameObject> enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
 			Vector3 currentPos = transform.position;
 
-			List<GameObject> enemiesInRange = new List<GameObject> ();
-			List<GameObject> enemiesInTarget;
-			foreach (GameObject t in enemies)
-			{
-				float dist = Vector3.Distance(t.transform.position, currentPos);
-				if (dist < skill.range) {
-					enemiesInRange.Add(t);
-				}
-			}
-			enemiesInTarget = GetEnemiesInTarget (enemiesInRange);
-
-			if (enemiesInRange.Count > 0 && enemiesInTarget.Count == 0 ) {
-				GameObject target = GetNearestEnemy (enemiesInRange);
+			List<GameObject> enemiesInRange = GetEnemiesInRange (enemies, transform, skill.range);
+			List<GameObject> enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
+			GameObject target = null;
+			if (enemiesInRange.Count > 0 && enemiesInTarget.Count == 0) {
+				target = GetNearestEnemy (enemiesInRange);
 				transform.LookAt (target.transform);
-				enemiesInTarget = GetEnemiesInTarget (enemiesInRange);
+				enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
+			}
+			if (skill.isMelee) {
+				foreach (GameObject t in enemiesInTarget) {
+					PhotonView photonView = PhotonView.Get (t);
+					photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
+				}
+			} else {
+				if (enemiesInTarget.Count > 0 || (target == null && enemiesInRange.Count > 0)) {
+					target = GetNearestEnemy (enemiesInTarget);
+				}
+				if (target != null)
+					if (skill.isAoe) {
+						enemiesInTarget = GetEnemiesInRange (enemies, target.transform, (float) skill.aoe);
+						foreach (GameObject t in enemiesInTarget) {
+							PhotonView photonView = PhotonView.Get (t);
+							photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
+						}
+					} else {
+						PhotonView photonView = PhotonView.Get (target);
+						photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
+					}
 			}
 
-			foreach (GameObject t in enemiesInTarget) {
-				PhotonView photonView = PhotonView.Get(t);
-				photonView.RPC("TakeDamage", PhotonTargets.All, skill.Damage());
-			}
+
 
 			anim.CrossFade (skill.animationName);
 			delays[0] = cooldowns[0];
@@ -97,17 +112,28 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private List<GameObject> GetEnemiesInTarget(List<GameObject> enemies){
+	private List<GameObject> GetEnemiesInTarget(List<GameObject> enemies, int skillWidth){
 		List<GameObject> enemiesInTarget = new List<GameObject> ();
 		foreach (GameObject t in enemies) {
 			Vector3 directionToTarget = t.transform.position - transform.position;
 			float angle = Vector3.Angle(transform.forward, directionToTarget);
-			if (Mathf.Abs(angle) < 45)
+			if (Mathf.Abs(angle) < skillWidth)
 			{
 				enemiesInTarget.Add (t);
 			}
 		}
 		return enemiesInTarget;
+	}
+
+	private List<GameObject> GetEnemiesInRange(List<GameObject> enemies, Transform origin, float range){
+		List<GameObject> enemiesInRange = new List<GameObject> ();
+		foreach (GameObject t in enemies) {
+			float dist = Vector3.Distance (t.transform.position, origin.position);
+			if (dist < range) {
+				enemiesInRange.Add (t);
+			}
+		}
+		return enemiesInRange;
 	}
 
 	private GameObject GetNearestEnemy(List<GameObject> enemies){
