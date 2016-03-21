@@ -68,6 +68,10 @@ public static class Game {
 				skill.damagePerLevel = (float) obj.GetDouble("damagePerLevel");
 				skill.cooldown = (float) obj.GetDouble("cooldown");
 				skill.range = (float) obj.GetDouble("range");
+				skill.isMelee = obj.GetBoolean("isMelee");
+				skill.isAoe = obj.GetBoolean("isAoe");
+				skill.aoe = obj.GetInt("aoe");
+				skill.width = obj.GetInt("width");
 
 				characterClass.skills.Add(skill);
 			}

@@ -5,7 +5,7 @@ using KiiCorp.Cloud.Storage;
 
 public static class GoblinClassInitializer {
 
-	private static void InitializeGoblinClass(){
+	public static void InitializeGoblinClass(){
 
 		KiiBucket characterClassBucket = Kii.Bucket("characterClasses");
 		KiiObject kiiObj = characterClassBucket.NewKiiObject();
@@ -52,6 +52,10 @@ public static class GoblinClassInitializer {
 		skill["damagePerLevel"] = 20d;
 		skill["cooldown"] = 1d;
 		skill["range"] = 5d;
+		skill["isMelee"] = true;
+		skill["isAoe"] = false;
+		skill["width"] = 45;
+		skill["aoe"] = 0;
 
 		skill.Save((KiiObject obj, Exception e) => {
 			if (e != null)

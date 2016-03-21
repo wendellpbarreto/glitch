@@ -8,7 +8,8 @@ public class Login : MonoBehaviour {
 	private string email = "admin@mail.com";
 	private string password = "password";
 	// Use this for initialization
-	void Start () {}
+	void Start () {
+	}
 
 	void OnGUI(){
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "Login")) {
@@ -48,7 +49,6 @@ public class Login : MonoBehaviour {
 				{
 					Debug.Log("Login succeeded");
 					Game.LoadStatic();
-//					Application.LoadLevel("CharacterSelection");
 				}
 			});
 	}
