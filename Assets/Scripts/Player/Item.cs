@@ -1,6 +1,6 @@
 ﻿using System;
 
-enum BodyPart{
+public enum BodyPart{
 	Head,
 	Body,
 	Shoulder,
@@ -9,7 +9,7 @@ enum BodyPart{
 	Weapon
 }
 
-enum ItemTier {
+public enum ItemTier {
 	Tier1,
 	Tier2,
 	Tier3

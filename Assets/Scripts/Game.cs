@@ -7,6 +7,9 @@ using System.Collections;
 
 public static class Game {
 	public static List<CharacterClass> characterClasses;
+	public static List<Enemy> enemies;
+	public static List<World> worlds;
+
 	public static List<Item> items;
 	public static bool gameIsReady = false;
 
@@ -14,6 +17,9 @@ public static class Game {
 		Game.LoadClasses();
 		Game.LoadClassesSkills();
 		Game.LoadItems ();
+		Game.LoadEnemies ();
+		Game.LoadWorlds ();
+		Game.LoadWorldsEnemies ();
 		gameIsReady = true;
 	}
 
@@ -111,6 +117,63 @@ public static class Game {
 		}
 	}
 
+	private static void LoadEnemies(){
+		enemies = new List<Enemy> ();
+
+		KiiBucket bucket = Kii.Bucket("enemies");
+		List<KiiObject> list = bucket.Query (new KiiQuery ());
+		Debug.Log(list.Count.ToString() + " enemies loaded");
+		foreach (KiiObject obj in list)
+		{
+			enemies.Add(
+				new Enemy(
+					obj.GetString("_id"),
+					obj.GetString("name"),
+					obj.GetString("prefabName"),
+					(float) obj.GetDouble("strenght"),
+					(float) obj.GetDouble("dextrery"),
+					(float) obj.GetDouble("inteligence"),
+					(float) obj.GetDouble("vitality")
+				)
+			);
+		}
+	}
+
+	private static void LoadWorlds(){
+		worlds = new List<World> ();
+
+		KiiBucket bucket = Kii.Bucket("worlds");
+		List<KiiObject> list = bucket.Query (new KiiQuery ());
+		Debug.Log(list.Count.ToString() + " worlds loaded");
+		foreach (KiiObject obj in list)
+		{
+			World world = new World (
+				              obj.GetString ("_id"),
+				              obj.GetString ("name"),
+				              obj.GetInt ("xpReward"),
+				              obj.GetInt ("goldReward"),
+				              obj.GetString ("itemTier")
+			              );
+			worlds.Add(world);
+		}
+	}
+
+	public static void LoadWorldsEnemies(){
+		KiiBucket bucket = Kii.Bucket("worldEnemies");
+		foreach (World world in worlds) {
+			KiiQuery query = new KiiQuery (KiiClause.Equals("worldId", world.id));
+			List<KiiObject> list = bucket.Query (query);
+			Debug.Log(world.name+": "+list.Count.ToString()+" spawn found");
+			foreach (KiiObject obj in list)
+			{
+				world.worldEnemies.Add (
+					new WorldEnemy (obj.GetString ("worldId"), obj.GetString ("enemyId"))
+				);
+			}
+		}
+	}
+
+
 	public static CharacterClass GetClassByName(string name){
 		foreach (CharacterClass characterClass in characterClasses) {
 			if (name == characterClass.name)
@@ -126,5 +189,20 @@ public static class Game {
 		}
 		return null;
 	}
-}
 
+	public static Enemy GetEnemyById(string id){
+		foreach (Enemy enemy in enemies) {
+			if (id == enemy.id)
+				return enemy;
+		}
+		return null;
+	}
+
+	public static World GetWorldById(string id){
+		foreach (World enemy in worlds) {
+			if (id == enemy.id)
+				return enemy;
+		}
+		return null;
+	}
+}

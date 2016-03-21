@@ -3,26 +3,56 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour {
+	public bool isActive = false;
+
 	public float range = 5;
 	public float delay = 0f;
 	public float cooldown = 2f;
 	public GameObject healthBar;
 
 	private Transform playerTransform;
-	private EnemyAttributes enemyAttributes;
+	private Enemy enemy;
 
+	public float currentHp;
+	public float currentMp;
 
-	void Start () {
-		enemyAttributes = new EnemyAttributes ();
+	public float MaxHP() {
+		return enemy.vitality * 100;
+	}
+
+	public float MaxMP() {
+		return enemy.inteligence * 100;
+	}
+
+	public bool IsAlive(){
+		return currentHp > 0;
+	}
+
+	public void Activate(Enemy enemy){
+		this.enemy = enemy;
+		this.currentHp = MaxHP ();
+		this.currentMp = MaxMP ();
+		this.isActive = true;
+	}
+
+	void AttackPlayer(){
+		PhotonView photonView = PhotonView.Get(this.playerTransform.gameObject);
+		photonView.RPC("TakeDamage", PhotonTargets.All, enemy.GetDamage());
+		delay = cooldown;
+	}
+
+	[PunRPC]
+	public void TakeDamage(float damage){
+		Debug.Log ("Enemy damaged for "+damage.ToString());
+		currentHp -= damage;
+		if (currentHp <= 0)
+			Destroy (this.gameObject);
 	}
 
 	void Update () {
-		if (!enemyAttributes.IsAlive ())
-			Destroy (this.gameObject);
-		else {
+		if (!isActive) {
 			if (delay > 0)
 				delay -= Time.deltaTime;
-
 			if (InRange() && playerTransform != null && delay <= 0) {
 				AttackPlayer ();
 			} else {
@@ -34,7 +64,7 @@ public class EnemyController : MonoBehaviour {
 	void OnGUI(){
 		gameObject.GetComponentInChildren<Canvas>().transform.LookAt (Camera.main.transform);
 
-		float hpRatio = enemyAttributes.currentHp / enemyAttributes.MaxHP ();
+		float hpRatio = currentHp / MaxHP ();
 		this.healthBar.transform.localScale = new Vector3 (hpRatio, healthBar.transform.localScale.y, healthBar.transform.localScale.z);
 	}
 
@@ -72,17 +102,5 @@ public class EnemyController : MonoBehaviour {
 
 	void UpdatePlayerTransform(){
 		this.playerTransform = GetNearPlayer ();
-	}
-
-	void AttackPlayer(){
-		PhotonView photonView = PhotonView.Get(this.playerTransform.gameObject);
-		photonView.RPC("TakeDamage", PhotonTargets.All, enemyAttributes.GetDamage());
-		delay = cooldown;
-	}
-
-	[PunRPC]
-	public void TakeDamage(float damage){
-		Debug.Log ("Enemy damaged for "+damage.ToString());
-		enemyAttributes.TakeDamage (damage);
 	}
 }

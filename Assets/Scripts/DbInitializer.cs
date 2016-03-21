@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using KiiCorp.Cloud.Storage;
 
-public static class GoblinClassInitializer {
+public static class DbInitializer {
 
 	public static void InitializeGoblinClass(){
 
@@ -102,5 +102,70 @@ public static class GoblinClassInitializer {
 				}
 			});
 		}
+	}
+
+	public static void InitializeEnemies(){
+		KiiBucket enemiesBucket = Kii.Bucket("enemies");
+		KiiObject obj = enemiesBucket.NewKiiObject();
+
+		obj ["name"] = "Monster1";
+		obj ["prefabName"] = "monsterPrefab";
+		obj ["quality"] = "Normal";
+
+		obj ["strenght"] = 1;
+		obj ["dextrery"] = 1;
+		obj ["inteligence"] = 1;
+		obj ["vitality"] = 1;
+
+		obj.Save((KiiObject kobj, Exception e) => {
+			if (e != null)
+			{
+				Debug.LogError("Failed to save score" + e.ToString());
+			}
+			else
+			{
+				Debug.Log("Enemy saved");
+			}
+		});
+	}
+
+	public static void InitializeWorlds(){
+		KiiBucket worldsBucket = Kii.Bucket("worlds");
+		KiiObject world = worldsBucket.NewKiiObject();
+
+		world ["name"] = "Monster1";
+		world ["xpReward"] = 100;
+		world ["goldReward"] = 100;
+		world ["itemTier"] = 1;
+
+		world.Save((KiiObject kobj, Exception e) => {
+			if (e != null)
+			{
+				Debug.LogError("Failed to save score" + e.ToString());
+			}
+			else
+			{	
+				Debug.Log("World saved");
+			}
+		});
+	}
+
+	public static void InitializeWorldEnemies(){
+		KiiBucket worldEnemiesBucket = Kii.Bucket("worldEnemies");
+		KiiObject worlEnemy = worldEnemiesBucket.NewKiiObject();
+
+		worlEnemy ["worldId"] = "";
+		worlEnemy ["enemyId"] = "";
+
+		worlEnemy.Save((KiiObject kobj, Exception e) => {
+			if (e != null)
+			{
+				Debug.LogError("Failed to save score" + e.ToString());
+			}
+			else
+			{
+				Debug.Log("World enemy saved");
+			}
+		});
 	}
 }
