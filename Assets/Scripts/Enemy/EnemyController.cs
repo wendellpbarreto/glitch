@@ -50,7 +50,7 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	void Update () {
-		if (!isActive) {
+		if (isActive) {
 			if (delay > 0)
 				delay -= Time.deltaTime;
 			if (InRange() && playerTransform != null && delay <= 0) {

@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class WorldScene : Photon.PunBehaviour {
-
+	
+	private bool levelReady = false;
+	private GameObject player;
 	// Use this for initialization
 	void OnLevelWasLoaded () {
 		PhotonNetwork.ConnectUsingSettings("0.1");
@@ -11,7 +14,13 @@ public class WorldScene : Photon.PunBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
-		
+		if (levelReady && GameObject.FindGameObjectsWithTag ("Enemy").Length == 0) {
+//			Player.currentWorld.GiveReward ();
+			PhotonNetwork.Disconnect();
+			Player.currentWorld = null;
+			Application.LoadLevel ("Home");
+		}
+
 	}
 
 	void OnGUI()
@@ -21,19 +30,18 @@ public class WorldScene : Photon.PunBehaviour {
 
 	public override void OnJoinedLobby()
 	{
-		PhotonNetwork.JoinRandomRoom();
+		PhotonNetwork.CreateRoom(null);
 	}
 
 	void OnPhotonRandomJoinFailed()
 	{
 		Debug.Log("Can't join random room!");
-		PhotonNetwork.CreateRoom(null);
 	}
 
 	void OnJoinedRoom()
 	{
 		Debug.Log ("Joined - "+Player.character.characterClassName);
-		GameObject player = PhotonNetwork.Instantiate(Player.character.characterClass.prefabName, Vector3.zero, Quaternion.identity, 0);
+		player = PhotonNetwork.Instantiate(Player.character.characterClass.prefabName, Vector3.zero, Quaternion.identity, 0);
 		if (player != null) {
 			PlayerController playerController = player.GetComponent<PlayerController>();
 			playerController.enabled = true;
@@ -57,14 +65,13 @@ public class WorldScene : Photon.PunBehaviour {
 						"prefabName: "+spawn.prefabName
 					);	
 					GameObject enemy = PhotonNetwork.Instantiate (spawn.prefabName, Vector3.zero, Quaternion.identity, 0);
-					Debug.Log ("here");
 					EnemyController enemyController = enemy.GetComponent<EnemyController> ();
-					Debug.Log ("here");
 					enemyController.Activate (spawn);
-					Debug.Log ("here");
 				}
 					
 			}
 		}
+
+		levelReady = true;
 	}
 }
