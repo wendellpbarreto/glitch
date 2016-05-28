@@ -36,4 +36,18 @@ public class Item {
 	public float dextrery;
 	public float inteligence;
 	public float vitality;
+
+	public String ToString(){
+		String returnString = "";
+		returnString += (this.name + "\n");
+		returnString += (this.bodyPart.ToString() + "\n");
+		returnString += ("HP: " + this.hp.ToString() + "\n");
+		returnString += ("MP: " + this.mp.ToString() + "\n");
+		returnString += ("Defense: " + this.defense.ToString() + "\n");
+		returnString += ("Str: " + this.strenght.ToString() + "\n");
+		returnString += ("Dex: " + this.dextrery.ToString() + "\n");
+		returnString += ("Int: " + this.inteligence.ToString() + "\n");
+		returnString += ("Vit: " + this.vitality.ToString() + "\n");
+		return returnString;
+	}
 }

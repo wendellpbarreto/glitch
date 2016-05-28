@@ -23,6 +23,10 @@ public class Home : MonoBehaviour {
 
 			GUI.TextArea (new Rect (Screen.width / 2 - 100, Screen.height / 2 - 50, 200, 30), "YOU ARE A " + Player.character.characterClassName);
 
+			if (GUI.Button (new Rect (Screen.width / 2 - 310, Screen.height / 2 - 15, 200, 30), "Inventory")) {
+				Application.LoadLevel ("Inventory");
+			}
+
 			foreach (World world in Game.worlds)
 				if (GUI.Button (new Rect (Screen.width / 2 - 100, Screen.height / 2 - 15, 200, 30), "Enter " + world.name)) {
 					Player.currentWorld = world;
@@ -56,14 +60,14 @@ public class Home : MonoBehaviour {
 				Debug.Log (Player.character.name + " - " + list.Count.ToString () + " character skills found");
 				foreach (KiiObject obj in list) {
 					Player.character.addKiiCharacterSkills (obj);
-					loadCharacterIventory();
 				}
+				loadCharacterIventory();
 			}
 		});
 	}
 
 	void loadCharacterIventory(){
-		KiiBucket bucket = Kii.Bucket("iventories");
+		KiiBucket bucket = Kii.Bucket("inventories");
 		KiiQuery query = new KiiQuery (KiiClause.Equals ("characterName", Player.character.name));
 		bucket.Query (query, (KiiQueryResult<KiiObject> list, Exception e) => {
 			if (e != null) {
