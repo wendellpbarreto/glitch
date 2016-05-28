@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using KiiCorp.Cloud.Storage;
 using System.Collections;
 
+
 public enum GameStatus{
 	Loading,
 	LoadedClasses,
@@ -245,5 +246,14 @@ public static class Game {
 				return enemy;
 		}
 		return null;
+	}
+
+	public static Item GetRandomItemFromTier(CharacterClass characterClass, string itemTier){
+		List<Item> avaliableItems = new List<Item> ();
+		foreach (Item item in items) {
+			if (item.itemTier == itemTier && item.characterClassName == characterClass.name)
+				avaliableItems.Add (item);
+		}
+		return avaliableItems[UnityEngine.Random.Range(0, avaliableItems.Count)];
 	}
 }

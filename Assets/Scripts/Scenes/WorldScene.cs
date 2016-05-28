@@ -5,6 +5,11 @@ using UnityEngine.SceneManagement;
 public class WorldScene : Photon.PunBehaviour {
 	
 	private bool levelReady = false;
+	private bool levelOver = false;
+	private Item itemWon;
+
+	public GUISkin skin;
+
 	private GameObject player;
 	// Use this for initialization
 	void OnLevelWasLoaded () {
@@ -14,23 +19,38 @@ public class WorldScene : Photon.PunBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
-		if (levelReady && GameObject.FindGameObjectsWithTag ("Enemy").Length == 0) {
+		if (!levelOver && levelReady && GameObject.FindGameObjectsWithTag ("Enemy").Length == 0 ) {
 //			Player.currentWorld.GiveReward ();
-			PhotonNetwork.Disconnect();
-			Player.currentWorld = null;
-			Application.LoadLevel ("Home");
+			EndLevel();
 		}
 
 	}
 
+	void EndLevel(){
+		itemWon = Player.currentWorld.GiveReward ();
+		levelOver = true;
+	}
+
 	void OnGUI()
 	{
+		GUI.skin = skin;
+
 		GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+
+		if (levelOver) {
+			GUI.Box (new Rect(Screen.width/2 - Screen.width/4, Screen.height/2 - Screen.height/4, Screen.width/2, Screen.height/2), "Rewards");
+			//Exibir rewards aqui
+			if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2, 200, 25), "Close")) {
+				PhotonNetwork.Disconnect ();
+				Player.currentWorld = null;
+				Application.LoadLevel ("Home");
+			}
+		}
 	}
 
 	public override void OnJoinedLobby()
 	{
-		PhotonNetwork.CreateRoom(null);
+		PhotonNetwork.CreateRoom(Player.character.name+System.DateTime.Now.ToString());
 	}
 
 	void OnPhotonRandomJoinFailed()

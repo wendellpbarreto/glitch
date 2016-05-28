@@ -156,4 +156,14 @@ public class PlayerController : MonoBehaviour {
 	public void TakeDamage(float damage){
 		Player.character.TakeDamage (damage);
 	}
+
+	[PunRPC]
+	public void PlayAnimation(string animationName){
+		anim.CrossFade (animationName);	
+	}
+
+	[PunRPC]
+	public void StopAnimation(){
+		anim.CrossFade ("idle");	
+	}
 }

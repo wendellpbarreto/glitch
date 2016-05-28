@@ -7,6 +7,8 @@ public class CreateCharacter : MonoBehaviour {
 	private CharacterClass characterClass;
 	private string name = "ADMIN";
 
+	public GUISkin skin;
+
 	// Use this for initialization
 	void OnLevelWasLoaded () {
 	}
@@ -17,9 +19,14 @@ public class CreateCharacter : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "DONE")) {
+		GUI.skin = skin;
+
+		name = GUI.TextField(new Rect(Screen.width/2 - 100, Screen.height/2 - 52, 200, 35), name, 25);
+
+		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "Create")) {
 			VerifyName ();
 		}
+
 		int i = 1;
 		if (Game.characterClasses != null && Game.characterClasses.Count > 0)
 			foreach(CharacterClass charClass in Game.characterClasses){
@@ -28,6 +35,10 @@ public class CreateCharacter : MonoBehaviour {
 				}
 				i += 1;
 			}
+
+		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 + 17 + Game.characterClasses.Count*32, 200, 30), "Cancel")) {
+			GoToCharacterSelection();
+		}
 		
 	}
 
@@ -49,7 +60,6 @@ public class CreateCharacter : MonoBehaviour {
 				Debug.LogError("Failed to save score" + e.ToString());
 			} else {
 				Debug.Log("Character created");
-				Application.LoadLevel("CharacterSelection");
 			}
 		});
 	}
@@ -138,8 +148,14 @@ public class CreateCharacter : MonoBehaviour {
 					createCharacterSkills();
 					createCharacterInventory();
 					addTier1Items();
+					GoToCharacterSelection();
 				}	
 			}
 		});
+	}
+
+	void GoToCharacterSelection (){
+		Game.gameStatus = GameStatus.LoadedWoroldsEnemies;
+		Application.LoadLevel("CharacterSelection");
 	}
 }
