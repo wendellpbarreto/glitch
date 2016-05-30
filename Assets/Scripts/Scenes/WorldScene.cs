@@ -84,7 +84,11 @@ public class WorldScene : Photon.PunBehaviour {
 						"Spawning: name "+spawn.name+", "+
 						"prefabName: "+spawn.prefabName
 					);	
-					GameObject enemy = PhotonNetwork.Instantiate (spawn.prefabName, Vector3.zero, Quaternion.identity, 0);
+					int angle = UnityEngine.Random.Range (1, 360);
+					float x = Mathf.Cos(angle)*30;
+					float z = Mathf.Sin(angle)*30;
+					Vector3 spawnPoint = new Vector3 (x, 0f, z);
+					GameObject enemy = PhotonNetwork.Instantiate (spawn.prefabName, spawnPoint, Quaternion.identity, 0);
 					EnemyController enemyController = enemy.GetComponent<EnemyController> ();
 					enemyController.Activate (spawn);
 				}
