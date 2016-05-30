@@ -25,8 +25,8 @@ public static class Game {
 	public static List<CharacterClass> characterClasses;
 	public static List<Enemy> enemies;
 	public static List<World> worlds;
-
 	public static List<Item> items;
+
 	public static GameStatus gameStatus;
 
 	public static void LoadClasses(){

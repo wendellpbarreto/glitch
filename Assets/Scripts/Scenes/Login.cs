@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using KiiCorp.Cloud.Storage;
 using System;
 
+
+[ExecuteInEditMode]
 public class Login : MonoBehaviour {
 
 	public GUISkin skin;
@@ -10,19 +13,17 @@ public class Login : MonoBehaviour {
 	private string username = "admin";
 	private string password = "password";
 	// Use this for initialization
-	void Start () {
-	}
 
 	void OnGUI(){
 		GUI.skin = skin;
 
-		username = GUI.TextField(new Rect(Screen.width/2 - 100, Screen.height/2 - 72, 200, 35), username, 25);
-		password = GUI.TextField(new Rect(Screen.width/2 - 100, Screen.height/2 - 35, 200, 35), password, 25);
+		username = GUI.TextField(new Rect(Screen.width/2 - 150, Screen.height/2 - 72, 300, 35), username, 25);
+		password = GUI.TextField(new Rect(Screen.width/2 - 150, Screen.height/2 - 35, 300, 35), password, 25);
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2, 200, 25), "Login")) {
 			DoLogin ();
 		}
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 + 28, 200, 25), "Register")) {
-			Application.LoadLevel ("Register");
+			SceneManager.LoadScene ("Register");
 		}
 	}
 
@@ -39,7 +40,7 @@ public class Login : MonoBehaviour {
 				else
 				{
 					Debug.Log("Login succeeded");
-					Application.LoadLevel("CharacterSelection");
+					SceneManager.LoadScene ("GameLoader");
 				}
 			});
 	}

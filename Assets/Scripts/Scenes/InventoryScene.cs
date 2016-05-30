@@ -1,19 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class InventoryScene : MonoBehaviour {
 	public GUISkin skin;
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	// Update is called once per frame
 	void OnGUI () {
 		GUI.skin = skin;
 
 		GUI.Box (new Rect(0, 5, Screen.width/2-5, Screen.height -5), "Equiped");
-
 
 
 

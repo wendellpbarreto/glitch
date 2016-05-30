@@ -1,28 +1,25 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using KiiCorp.Cloud.Storage;
 using System;
 
+[ExecuteInEditMode]
 public class CreateCharacter : MonoBehaviour {
 	private CharacterClass characterClass;
-	private string name = "ADMIN";
+	private string name = "CharacterName";
 
 	public GUISkin skin;
 
-	// Use this for initialization
-	void OnLevelWasLoaded () {
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+	void OnLevelWasLoaded(){
+		this.characterClass = Game.characterClasses [0];
 	}
 
 	void OnGUI(){
 		GUI.skin = skin;
 
-		name = GUI.TextField(new Rect(Screen.width/2 - 100, Screen.height/2 - 52, 200, 35), name, 25);
-
+		name = GUI.TextField(new Rect(Screen.width/2 - 150, Screen.height/2 - 104, 300, 35), name, 25);
+		GUI.Label(new Rect(Screen.width/2 - 150, Screen.height/2 - 52, 300, 35), "Class - "+characterClass.name);
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "Create")) {
 			VerifyName ();
 		}
@@ -60,6 +57,8 @@ public class CreateCharacter : MonoBehaviour {
 				Debug.LogError("Failed to save score" + e.ToString());
 			} else {
 				Debug.Log("Character created");
+				Player.character = Character.KiiObjToCharacter(obj);
+				createCharacterSkills();
 			}
 		});
 	}
@@ -76,6 +75,7 @@ public class CreateCharacter : MonoBehaviour {
 					Debug.LogError("Failed to save score" + e.ToString());
 				} else {
 					Debug.Log("Character skill created");
+					createCharacterInventory();
 				}
 			});
 		}
@@ -99,6 +99,8 @@ public class CreateCharacter : MonoBehaviour {
 				Debug.LogError("Failed to save score" + e.ToString());
 			} else {
 				Debug.Log("Character inventory created");
+				addTier1Items();
+
 			}
 		});
 	}
@@ -126,6 +128,8 @@ public class CreateCharacter : MonoBehaviour {
 							Debug.LogError("Failed to save score" + e.ToString());
 						} else {
 							Debug.Log("Character item created");
+							if (list.IndexOf(obj) == list.Count-1)
+								GoToHomeScreen();
 						}
 					});
 				}
@@ -145,17 +149,16 @@ public class CreateCharacter : MonoBehaviour {
 				} else {
 					Debug.Log("Name is avaliable");
 					createCharacter();
-					createCharacterSkills();
-					createCharacterInventory();
-					addTier1Items();
-					GoToCharacterSelection();
 				}	
 			}
 		});
 	}
 
 	void GoToCharacterSelection (){
-		Game.gameStatus = GameStatus.LoadedWoroldsEnemies;
-		Application.LoadLevel("CharacterSelection");
+		SceneManager.LoadScene("CharacterSelection");
+	}
+
+	void GoToHomeScreen(){
+		SceneManager.LoadScene("Home");
 	}
 }
