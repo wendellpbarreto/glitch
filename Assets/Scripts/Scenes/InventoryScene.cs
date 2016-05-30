@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
+[ExecuteInEditMode]
 public class InventoryScene : MonoBehaviour {
 	public GUISkin skin;
 	
@@ -9,24 +9,10 @@ public class InventoryScene : MonoBehaviour {
 	void OnGUI () {
 		GUI.skin = skin;
 
-		GUI.Box (new Rect(0, 5, Screen.width/2-5, Screen.height -5), "Equiped");
+		GUI.Box (new Rect(15, 15, Screen.width/4, Screen.height -30), "Equiped");
 
+		GUI.Box (new Rect(Screen.width/4 + 30, 15, Screen.width*3/4-45, Screen.height /2 -15 ), "Bag");
 
-
-		GUI.Box (new Rect(Screen.width/2 + 5, 5, Screen.width/2-5, Screen.height -5), "Bag");
-
-		int row = 0;
-		int col = 0;
-
-		foreach (CharacterItem characterItem in Player.character.inventory.bag){
-			Item item = Game.GetItemById (characterItem.itemId);
-			GUI.Button(new Rect(Screen.width/2+5+(col*65), 55+row*52, 60, 50), new GUIContent(item.name, item.ToString()));
-			col++;
-			if (col > 5) {
-				col = 0;
-				row++;
-			}
-		}
-		GUI.Label(new Rect(Screen.width/2+5, Screen.height/2, Screen.width/2-5, Screen.height/2), GUI.tooltip);
+		GUI.Label(new Rect(Screen.width/4 + 30, Screen.height/2+10, Screen.width*3/4-45, Screen.height/2 -25), GUI.tooltip);
 	}
 }
