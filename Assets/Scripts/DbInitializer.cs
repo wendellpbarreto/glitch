@@ -5,6 +5,25 @@ using KiiCorp.Cloud.Storage;
 
 public static class DbInitializer {
 
+	public static void InitializeLevelsXp(){
+		for (int i = 0; i < 10; i++) {
+			KiiBucket levelsXpBucket = Kii.Bucket("levelsXp");
+			KiiObject kiiObj = levelsXpBucket.NewKiiObject();
+			kiiObj ["level"] = i + 1;
+			kiiObj ["xp"] = (i+1)*(i+1)*100;
+			kiiObj.Save((KiiObject obj, Exception e) => {
+				if (e != null)
+				{
+					Debug.LogError("Failed to save level xp" + e.ToString());
+				}
+				else
+				{
+					Debug.Log("LevelXp Saved");
+				}
+			});
+		}
+	}
+
 	public static void InitializeGoblinClass(){
 
 		KiiBucket characterClassBucket = Kii.Bucket("characterClasses");

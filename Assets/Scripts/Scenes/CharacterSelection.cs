@@ -19,10 +19,10 @@ public class CharacterSelection : MonoBehaviour {
 		int i = 1;
 		if (Player.characters != null && Player.characters.Count > 0)
 			foreach(Character character in Player.characters){
-				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), character.name.ToString () + " - " + character.level.ToString ())) {
+				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), character.name.ToString () + " - " + character.Level().ToString ())) {
 					Debug.LogWarning ("Character selected");
 					Player.character = character;
-					SceneManager.LoadScene ("Home");
+					SceneManager.LoadScene ("CharacterLoader");
 				}
 				i += 1;
 			}

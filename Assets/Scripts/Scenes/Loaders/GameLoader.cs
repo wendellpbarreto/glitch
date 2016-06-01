@@ -8,11 +8,16 @@ public class GameLoader : MonoBehaviour {
 
 	void OnLevelWasLoaded () {
 		if (Game.gameStatus == GameStatus.Loading)
-			Game.LoadClasses();
+			Game.LoadLevelsXp();
 	}
 
 	// Update is called once per frame
 	void Update () {
+		if (Game.gameStatus == GameStatus.LoadedLevelsXp) {
+			Debug.Log (Game.gameStatus);
+			Game.gameStatus = GameStatus.Loading;
+			Game.LoadClasses();
+		}
 		if (Game.gameStatus == GameStatus.LoadedClasses) {
 			Debug.Log (Game.gameStatus);
 			Game.gameStatus = GameStatus.Loading;

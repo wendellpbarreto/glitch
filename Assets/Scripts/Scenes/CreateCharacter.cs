@@ -46,7 +46,6 @@ public class CreateCharacter : MonoBehaviour {
 		KiiObject kiiObj = bucket.NewKiiObject();
 		kiiObj["username"] = user.Username;
 		kiiObj["name"] = this.name;
-		kiiObj["level"] = 0;
 		kiiObj["experience"] = 0;
 		kiiObj["title"] = "noob";
 		kiiObj["gold"] = 0;

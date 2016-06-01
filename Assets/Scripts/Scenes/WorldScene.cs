@@ -43,7 +43,7 @@ public class WorldScene : Photon.PunBehaviour {
 			if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2, 200, 25), "Close")) {
 				PhotonNetwork.Disconnect ();
 				Player.currentWorld = null;
-				SceneManager.LoadScene ("Home");
+				SceneManager.LoadScene ("CharacterLoader");
 			}
 		}
 	}

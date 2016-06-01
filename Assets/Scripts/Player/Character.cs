@@ -6,7 +6,6 @@ using KiiCorp.Cloud.Storage;
 public class Character {
 	private string username;
 	public string name;
-	public int level;
 	public int experience;
 	public string title;
 	public int gold;
@@ -29,6 +28,10 @@ public class Character {
 	public void EnterWorld(){
 		this.currentHp = this.MaxHP ();
 		this.currentHp = this.MaxMP ();
+	}
+
+	public int Level(){
+		return CharacterLevel.GetLevelByXp (this.experience);
 	}
 
 	public float MaxHP() {
@@ -56,30 +59,32 @@ public class Character {
 	}
 
 	public float MainAttributeValue(){
+		float characterAttribute = this.characterClass.MainAttributeValue ();
+		characterAttribute += this.Level () * this.characterClass.MainAttributeGrowthValue ();
 		if (this.inventory != null)
-			return this.characterClass.MainAttributeValue() + this.inventory.AttributeByName(this.characterClass.mainAttributeName);
-		return this.characterClass.MainAttributeValue ();
+			characterAttribute += this.inventory.AttributeByName(this.characterClass.mainAttributeName);
+		return characterAttribute;
 	}
 
 	public void addKiiCharacterItem(KiiObject obj){
-		this.inventory.bag.Add (new CharacterItem (obj.GetString("itemId"), this.name));
+		this.inventory.bag.Add (new CharacterItem (obj.GetString("_id"), obj.GetString("itemId"), this.name));
 	}
 
 	public void addKiiInventory(KiiObject obj){
 		this.inventory.characterName = obj.GetString("characterName");
 
-		if (obj.GetString("head") != "")
-			this.inventory.head = new CharacterItem(obj.GetString("head"), this.name);
-		if (obj.GetString("body") != "")
-			this.inventory.body = new CharacterItem(obj.GetString("body"), this.name);
-		if (obj.GetString("shoulder") != "")
-			this.inventory.shoulder = new CharacterItem(obj.GetString("shoulder"), this.name);
-		if (obj.GetString("hand") != "")
-			this.inventory.hand = new CharacterItem(obj.GetString("hand"), this.name);
-		if (obj.GetString("feet") != "")
-			this.inventory.feet = new CharacterItem(obj.GetString("feet"), this.name);
-		if (obj.GetString("weapon") != "")
-			this.inventory.weapon = new CharacterItem(obj.GetString("weapon"), this.name);
+		if (obj.GetString ("head") != "")
+			this.inventory.head = obj.GetString ("head");
+		if (obj.GetString ("body") != "")
+			this.inventory.body = obj.GetString ("body");
+		if (obj.GetString ("shoulder") != "")
+			this.inventory.shoulder = obj.GetString ("shoulder");
+		if (obj.GetString ("hand") != "")
+			this.inventory.hand = obj.GetString ("hand");
+		if (obj.GetString ("feet") != "")
+			this.inventory.feet = obj.GetString ("feet");
+		if (obj.GetString ("weapon") != "")
+			this.inventory.weapon = obj.GetString ("weapon");
 	}
 
 	public void addKiiCharacterSkills(KiiObject obj){
@@ -95,7 +100,6 @@ public class Character {
 		character.username = obj.GetString ("username");
 		character.name = obj.GetString ("name");
 		character.title = obj.GetString ("title");
-		character.level = obj.GetInt ("level");
 		character.experience = obj.GetInt ("experience");
 		character.gold = obj.GetInt ("gold");
 		character.gem = obj.GetInt ("gem");

@@ -34,4 +34,13 @@ public class CharacterClass : BaseAttributes {
 		}
 	}
 
+	public float MainAttributeGrowthValue(){
+		switch(mainAttributeName){
+		case "Strenght": return this.strenghtPerLevel; break;
+		case "Dextrery": return this.dextreryPerLevel; break;
+		case "Inteligence": return this.inteligencePerLevel; break;
+		case "Vitality": return this.vitalityPerLevel; break;
+		default: return 0f; break;
+		}
+	}
 }

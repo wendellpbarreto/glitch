@@ -7,6 +7,7 @@ using System.Collections;
 
 public enum GameStatus{
 	Loading,
+	LoadedLevelsXp,
 	LoadedClasses,
 	LoadedClassesSkills,
 	LoadedItems,
@@ -28,6 +29,24 @@ public static class Game {
 	public static List<Item> items;
 
 	public static GameStatus gameStatus;
+
+	public static void LoadLevelsXp(){
+		CharacterLevel.xpForLevel = new List<int> ();
+		KiiBucket bucket = Kii.Bucket("levelsXp");
+		KiiQuery query = new KiiQuery ();
+		query.SortByAsc ("level");
+		bucket.Query (query, (KiiQueryResult<KiiObject> list, Exception e) => {
+			if (e != null) {
+				Debug.LogError ("Failed to load levels xp" + e.ToString ());
+			} else {
+				Debug.Log (list.Count.ToString () + " levels xp");
+				foreach (KiiObject obj in list) {
+					CharacterLevel.xpForLevel.Add(obj.GetInt("xp"));
+				}
+				Game.gameStatus = GameStatus.LoadedLevelsXp;
+			}
+		});
+	}
 
 	public static void LoadClasses(){
 		characterClasses = new List<CharacterClass> ();

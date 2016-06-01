@@ -27,8 +27,6 @@ public class Login : MonoBehaviour {
 		}
 	}
 
-
-
 	void DoLogin(){
 		KiiUser.LogIn(username,password, (KiiUser user, Exception e) =>
 			{
