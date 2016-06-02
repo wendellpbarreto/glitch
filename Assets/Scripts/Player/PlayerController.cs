@@ -12,9 +12,16 @@ public class PlayerController : MonoBehaviour {
 	private float[] cooldowns;
 
     Animation anim;
+	public AudioClip attack;
+	public AudioClip spell;
+	AudioSource audioSource;
 
     void Start()
     {
+		audioSource = GameObject.Find("SFX").GetComponent<AudioSource> ();
+		if (audioSource)
+			Debug.Log ("Loaded Audio source");
+
 		List<Skill> charSkills = Player.character.characterClass.skills;
 
         anim = GetComponent<Animation>();
@@ -36,8 +43,10 @@ public class PlayerController : MonoBehaviour {
 				transform.Translate (new Vector3 (0, 0, 1) * speed * Time.deltaTime);
 				anim.CrossFade ("run");
 			} else if (CrossPlatformInputManager.GetButton ("Attack")) {
+				audioSource.PlayOneShot (attack);
 				UseSkill(0);
 			} else if (CrossPlatformInputManager.GetButton ("Skill")) {
+				audioSource.PlayOneShot (spell);
 				UseSkill(1);
 			} else {
 				anim.CrossFade ("idle");

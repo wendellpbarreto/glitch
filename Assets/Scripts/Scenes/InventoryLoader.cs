@@ -8,6 +8,9 @@ public class InventoryLoader : MonoBehaviour {
 
 	public GUISkin skin;
 
+	public AudioSource audioSource;
+	public AudioClip audioClip;
+
 	void OnGUI(){
 		GUI.skin = skin;
 		
@@ -52,8 +55,10 @@ public class InventoryLoader : MonoBehaviour {
 		}
 		foreach (CharacterItem characterItem in Player.character.inventory.bag){
 			Item item = Game.GetItemById (characterItem.itemId);
-			if (GUI.Button (new Rect (Screen.width / 4 + 45 + (col * 65), 55 + row * 67, 60, 65), new GUIContent (item.name+"\n"+item.bodyPart, item.ToString ())))
+			if (GUI.Button (new Rect (Screen.width / 4 + 45 + (col * 65), 55 + row * 67, 60, 65), new GUIContent (item.name + "\n" + item.bodyPart, item.ToString ()))) {
+				audioSource.PlayOneShot (audioClip);
 				EquipItem (item);
+			}
 			GUI.Label(new Rect(Screen.width/4 + 30, Screen.height/2+10, Screen.width*3/4-45, Screen.height/2 -25), GUI.tooltip);
 			col++;
 			if (col > 7) {
@@ -61,8 +66,10 @@ public class InventoryLoader : MonoBehaviour {
 				row++;
 			}
 		}
-		if (GUI.Button (new Rect (Screen.width - 225, Screen.height - 75, 200, 50), "Close"))
+		if (GUI.Button (new Rect (Screen.width - 225, Screen.height - 75, 200, 50), "Close")) {
+			audioSource.PlayOneShot (audioClip);
 			SceneManager.LoadScene ("Home");
+		}
 	}
 
 	void EquipItem(Item item){

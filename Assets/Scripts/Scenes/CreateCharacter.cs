@@ -11,6 +11,9 @@ public class CreateCharacter : MonoBehaviour {
 
 	public GUISkin skin;
 
+	public AudioSource audioSource;
+	public AudioClip audioClip;
+
 	void OnLevelWasLoaded(){
 		this.characterClass = Game.characterClasses [0];
 	}
@@ -21,6 +24,7 @@ public class CreateCharacter : MonoBehaviour {
 		name = GUI.TextField(new Rect(Screen.width/2 - 150, Screen.height/2 - 104, 300, 35), name, 25);
 		GUI.Label(new Rect(Screen.width/2 - 150, Screen.height/2 - 52, 300, 35), "Class - "+characterClass.name);
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15, 200, 30), "Create")) {
+			audioSource.PlayOneShot (audioClip);
 			VerifyName ();
 		}
 
@@ -28,12 +32,14 @@ public class CreateCharacter : MonoBehaviour {
 		if (Game.characterClasses != null && Game.characterClasses.Count > 0)
 			foreach(CharacterClass charClass in Game.characterClasses){
 				if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 - 15 + i*35, 200, 30), charClass.name)) {
+					audioSource.PlayOneShot (audioClip);
 					this.characterClass = charClass;
 				}
 				i += 1;
 			}
 
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 + 17 + Game.characterClasses.Count*32, 200, 30), "Cancel")) {
+			audioSource.PlayOneShot (audioClip);
 			GoToCharacterSelection();
 		}
 		

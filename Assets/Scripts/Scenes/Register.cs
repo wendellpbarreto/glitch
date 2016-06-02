@@ -13,6 +13,9 @@ public class Register : MonoBehaviour {
 	private string username = "username";
 	private string email = "email";
 	private string password = "password";
+
+	public AudioSource audioSource;
+	public AudioClip audioClip;
 	// Use this for initialization
 
 	void OnGUI(){
@@ -23,10 +26,12 @@ public class Register : MonoBehaviour {
 		password = GUI.TextField(new Rect(Screen.width/2 - 150, Screen.height/2 - 35, 300, 35), password, 25);
 
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2 + 28, 200, 25), "Register")) {
+			audioSource.PlayOneShot (audioClip);
 			DoRegister ();
 		}
 
 		if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2, 200, 25), "Cancel")) {
+			audioSource.PlayOneShot (audioClip);
 			GoToLogin ();
 		}
 	}

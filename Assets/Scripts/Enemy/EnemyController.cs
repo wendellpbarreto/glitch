@@ -16,6 +16,10 @@ public class EnemyController : MonoBehaviour {
 	public float currentHp;
 	public float currentMp;
 
+
+	Animation anim;
+
+
 	public float MaxHP() {
 		return enemy.vitality * 100;
 	}
@@ -36,6 +40,7 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	void AttackPlayer(){
+		anim.CrossFade ("attack");
 		PhotonView photonView = PhotonView.Get(this.playerTransform.gameObject);
 		photonView.RPC("TakeDamage", PhotonTargets.All, enemy.GetDamage());
 		delay = cooldown;
@@ -47,6 +52,10 @@ public class EnemyController : MonoBehaviour {
 		currentHp -= damage;
 		if (currentHp <= 0)
 			Destroy (this.gameObject);
+	}
+
+	void Start(){
+		anim = GetComponent<Animation>();
 	}
 
 	void Update () {
@@ -96,6 +105,7 @@ public class EnemyController : MonoBehaviour {
 		UpdatePlayerTransform ();
 		if (playerTransform != null) {
 			transform.LookAt (playerTransform);
+			anim.CrossFade ("walk");
 			GetComponent<CharacterController> ().SimpleMove (transform.forward);
 		}
 	}
