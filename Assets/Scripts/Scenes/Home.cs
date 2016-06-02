@@ -11,7 +11,10 @@ public class Home : MonoBehaviour {
 	void OnGUI(){
 		GUI.skin = skin;
 		string playerMainAttribute = Player.character.characterClass.mainAttributeName;
-		float playerMainAttributeValue = Player.character.characterClass.MainAttributeValue() + Player.character.inventory.AttributeByName(playerMainAttribute);
+		float playerMainAttributeValue = Player.character.characterClass.MainAttributeValue()
+			+Player.character.characterClass.MainAttributeGrowthValue()
+			+Player.character.inventory.AttributeByName(playerMainAttribute);
+		
 		GUI.Label (new Rect (15, 15, 200, 30), "Name: " + Player.character.name);
 		GUI.Label (new Rect (15, 47 , 200, 30), "Class: " + Player.character.characterClassName);
 		GUI.Label (new Rect (15, 79, 200, 30), "Level: " + Player.character.Level().ToString());
