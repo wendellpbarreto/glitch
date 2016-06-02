@@ -43,10 +43,8 @@ public class PlayerController : MonoBehaviour {
 				transform.Translate (new Vector3 (0, 0, 1) * speed * Time.deltaTime);
 				anim.CrossFade ("run");
 			} else if (CrossPlatformInputManager.GetButton ("Attack")) {
-				audioSource.PlayOneShot (attack);
 				UseSkill(0);
 			} else if (CrossPlatformInputManager.GetButton ("Skill")) {
-				audioSource.PlayOneShot (spell);
 				UseSkill(1);
 			} else {
 				anim.CrossFade ("idle");
@@ -92,11 +90,13 @@ public class PlayerController : MonoBehaviour {
 				enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
 			}
 			if (skill.isMelee) {
+				audioSource.PlayOneShot (attack);
 				foreach (GameObject t in enemiesInTarget) {
 					PhotonView photonView = PhotonView.Get (t);
 					photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
 				}
 			} else {
+				audioSource.PlayOneShot (spell);
 				if (enemiesInTarget.Count > 0 || (target == null && enemiesInRange.Count > 0)) {
 					target = GetNearestEnemy (enemiesInTarget);
 				}

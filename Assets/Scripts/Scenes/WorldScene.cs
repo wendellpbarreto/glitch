@@ -40,7 +40,7 @@ public class WorldScene : Photon.PunBehaviour {
 		if (levelOver) {
 			GUI.Box (new Rect(Screen.width/2 - Screen.width/4, Screen.height/2 - Screen.height/4, Screen.width/2, Screen.height/2), "Rewards");
 			//Exibir rewards aqui
-			if (GUI.Button (new Rect (Screen.width/2 - 100, Screen.height/2, 200, 25), "Close")) {
+			if (GUI.Button (new Rect (Screen.width*3/4 - 215, Screen.height/2, 200, 25), "Close")) {
 				PhotonNetwork.Disconnect ();
 				Player.currentWorld = null;
 				SceneManager.LoadScene ("CharacterLoader");
