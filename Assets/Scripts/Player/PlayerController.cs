@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour {
 	public AudioClip spell;
 	AudioSource audioSource;
 
+	private bool crRunning = false;
+
     void Start()
     {
 		audioSource = GameObject.Find("SFX").GetComponent<AudioSource> ();
@@ -38,17 +40,24 @@ public class PlayerController : MonoBehaviour {
 		if (isControllable) {
 			float x = CrossPlatformInputManager.GetAxis ("Horizontal"),
 			y = CrossPlatformInputManager.GetAxis ("Vertical");
-			if (x != 0 || y != 0) {
-				transform.LookAt (transform.position + new Vector3 (x, 0f, y));
-				transform.Translate (new Vector3 (0, 0, 1) * speed * Time.deltaTime);
-				anim.CrossFade ("run");
-			} else if (CrossPlatformInputManager.GetButton ("Attack")) {
-				UseSkill(0);
-			} else if (CrossPlatformInputManager.GetButton ("Skill")) {
-				UseSkill(1);
+
+			if (crRunning) {
+				if (CrossPlatformInputManager.GetButtonUp ("Attack") || CrossPlatformInputManager.GetButtonUp ("Skill"))
+					StopGlitch ();
 			} else {
-				anim.CrossFade ("idle");
+				if (CrossPlatformInputManager.GetButtonDown ("Attack")) {
+					UseSkill (0);
+				} else if (CrossPlatformInputManager.GetButtonDown ("Skill")) {
+					UseSkill (1);
+				} else if (x != 0 || y != 0) {
+					transform.LookAt (transform.position + new Vector3 (x, 0f, y));
+					transform.Translate (new Vector3 (0, 0, 1) * speed * Time.deltaTime);
+					anim.CrossFade ("run");
+				} else {
+					anim.CrossFade ("idle");
+				}
 			}
+				
 		}
     }
 
@@ -78,46 +87,70 @@ public class PlayerController : MonoBehaviour {
 		Skill skill = Player.character.characterClass.skills[index];
 
 		if (delays[0] <= 0 && delays[index+1] <= 0) {
-			List<GameObject> enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
-			Vector3 currentPos = transform.position;
+			delays[0] = cooldowns[0];
+			delays [index + 1] = cooldowns [index + 1];
+			crRunning = true;
+			StartCoroutine ("Glitch", skill);
+		}
+	}
 
-			List<GameObject> enemiesInRange = GetEnemiesInRange (enemies, transform, skill.range);
-			List<GameObject> enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
-			GameObject target = null;
-			if (enemiesInRange.Count > 0 && enemiesInTarget.Count == 0) {
-				target = GetNearestEnemy (enemiesInRange);
-				transform.LookAt (target.transform);
-				enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
+	IEnumerator Glitch(Skill skill){
+		SendAnimation (skill.animationName);
+		yield return new WaitForSeconds(1);
+		SendSkill (skill);
+		StopGlitch ();
+	}
+
+	private void StopGlitch(){
+		crRunning = false;
+		StopAllCoroutines ();
+		SendStopAnimation ();
+	}
+
+	private void SendAnimation(string animationName){
+		PhotonView photonView = PhotonView.Get (this);
+		photonView.RPC ("PlayAnimation", PhotonTargets.All, animationName);
+	}
+
+	private void SendStopAnimation(){
+		PhotonView photonView = PhotonView.Get (this);
+		photonView.RPC ("StopAnimation", PhotonTargets.All);
+	}
+
+	private void SendSkill(Skill skill){
+		List<GameObject> enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+		Vector3 currentPos = transform.position;
+
+		List<GameObject> enemiesInRange = GetEnemiesInRange (enemies, transform, skill.range);
+		List<GameObject> enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
+		GameObject target = null;
+		if (enemiesInRange.Count > 0 && enemiesInTarget.Count == 0) {
+			target = GetNearestEnemy (enemiesInRange);
+			transform.LookAt (target.transform);
+			enemiesInTarget = GetEnemiesInTarget (enemiesInRange, skill.width);
+		}
+		if (skill.isMelee) {
+			audioSource.PlayOneShot (attack);
+			foreach (GameObject t in enemiesInTarget) {
+				PhotonView photonView = PhotonView.Get (t);
+				photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
 			}
-			if (skill.isMelee) {
-				audioSource.PlayOneShot (attack);
+		} else {
+			audioSource.PlayOneShot (spell);
+			if (enemiesInTarget.Count > 0 || (target == null && enemiesInRange.Count > 0)) {
+				target = GetNearestEnemy (enemiesInTarget);
+			}
+			if (target != null)
+			if (skill.isAoe) {
+				enemiesInTarget = GetEnemiesInRange (enemies, target.transform, (float) skill.aoe);
 				foreach (GameObject t in enemiesInTarget) {
 					PhotonView photonView = PhotonView.Get (t);
 					photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
 				}
 			} else {
-				audioSource.PlayOneShot (spell);
-				if (enemiesInTarget.Count > 0 || (target == null && enemiesInRange.Count > 0)) {
-					target = GetNearestEnemy (enemiesInTarget);
-				}
-				if (target != null)
-					if (skill.isAoe) {
-						enemiesInTarget = GetEnemiesInRange (enemies, target.transform, (float) skill.aoe);
-						foreach (GameObject t in enemiesInTarget) {
-							PhotonView photonView = PhotonView.Get (t);
-							photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
-						}
-					} else {
-						PhotonView photonView = PhotonView.Get (target);
-						photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
-					}
+				PhotonView photonView = PhotonView.Get (target);
+				photonView.RPC ("TakeDamage", PhotonTargets.All, skill.Damage ());
 			}
-
-
-
-			anim.CrossFade (skill.animationName);
-			delays[0] = cooldowns[0];
-			delays [index + 1] = cooldowns [index + 1];
 		}
 	}
 
@@ -168,11 +201,12 @@ public class PlayerController : MonoBehaviour {
 
 	[PunRPC]
 	public void PlayAnimation(string animationName){
-		anim.CrossFade (animationName);	
+		anim.clip = anim.GetClip (animationName);	
+		anim.Play ();
 	}
 
 	[PunRPC]
 	public void StopAnimation(){
-		anim.CrossFade ("idle");	
+		anim.Stop ();
 	}
 }
